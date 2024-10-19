@@ -12,12 +12,10 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
 
 // Routes
-const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes'); 
 
 app.use('/api/items', coffeeItemRoutes);
-app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/orders', adminOrderRoutes); 
