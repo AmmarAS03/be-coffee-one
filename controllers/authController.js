@@ -43,7 +43,53 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.register = (req, res) => {
-  // Implement registration logic here
-  res.send('Register route');
-};
+exports.register = async (req, res) => {
+    try {
+      const { name, email, password } = req.body;
+      const db = req.app.locals.db;
+      const usersCollection = db.collection('users');
+  
+      // Check if user already exists
+      const existingUser = await usersCollection.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User with this email already exists" });
+      }
+  
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+  
+      // Create new user
+      const newUser = {
+        name,
+        email,
+        password: hashedPassword,
+        role: 'user', // Default role
+        createdAt: new Date()
+      };
+  
+      // Insert the new user into the database
+      const result = await usersCollection.insertOne(newUser);
+  
+      // Create and sign JWT
+      const token = jwt.sign(
+        { id: result.insertedId, email: newUser.email, role: newUser.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+  
+      res.status(201).json({
+        message: "User registered successfully",
+        token,
+        user: {
+          id: result.insertedId,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role
+        }
+      });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({ message: "Server error during registration" });
+    }
+  };

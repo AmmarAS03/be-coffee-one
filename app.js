@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const { connectToDatabase } = require('./config/database');
 const coffeeItemRoutes = require('./routes/coffeeItemRoutes');
+const adminOrderRoutes = require('./routes/adminOrderRoutes');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/api/items', coffeeItemRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin/orders', adminOrderRoutes); 
 
 
 // Update the basic route for testing
